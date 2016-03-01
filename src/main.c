@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-//#include <trace.h>
+#include "diag/Trace.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -17,6 +17,9 @@ DMA_HandleTypeDef hdma_usart2_tx;
 DMA_HandleTypeDef hdma_usart2_rx;
 char *msg = "Hello, Suk \r\n";
 char *msg1 = "mmh...Heisse Schnitte!:-)\r\n";
+#define size_of_rx_circular_buffer 128
+uint8_t rx_circular_buffer[size_of_rx_circular_buffer];
+uint8_t const * rx_tail_ptr;
 
 
 /* USER CODE BEGIN PV */
@@ -65,9 +68,14 @@ void DMAReceivingComplete(DMA_HandleTypeDef *hdma);
   hdma_usart2_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
   hdma_usart2_rx.Init.Mode = DMA_CIRCULAR;
   hdma_usart2_rx.Init.Priority = DMA_PRIORITY_LOW;
+  hdma_usart2_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+  hdma_usart2_tx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_1QUARTERFULL;
+  hdma_usart2_tx.Init.MemBurst = DMA_MBURST_SINGLE;
+  hdma_usart2_tx.Init.PeriphBurst = DMA_PBURST_SINGLE;
   hdma_usart2_rx.Init.Channel = DMA_CHANNEL_4; //check other channel
   hdma_usart2_rx.XferCpltCallback = &DMAReceivingComplete;
   HAL_DMA_Init(&hdma_usart2_rx);
+  __HAL_LINKDMA(&huart2, hdmarx, hdma_usart2_rx);
 
   uint8_t data[20];
   uint8_t error;
@@ -85,12 +93,8 @@ void DMAReceivingComplete(DMA_HandleTypeDef *hdma);
 
   /* Infinite loop */
 
-  //HAL_DMA_Start_IT(&hdma_usart2_rx, (uint8_t)data, (int32_t)&huart2. )
 
-
-  //HAL_DMA_Start(&hdma_usart2_rx, (uint32_t)&huart2.Instance->DR, (uint32_t)&LD2_GPIO_Port->ODR, 1);
-
-
+  HAL_UART_Receive_DMA(&huart2, rx_circular_buffer, size_of_rx_circular_buffer);
 
   while (1)
   {
@@ -102,19 +106,9 @@ void DMAReceivingComplete(DMA_HandleTypeDef *hdma);
 		  HAL_DMA_Start_IT(&hdma_usart2_tx,  (uint32_t)msg1,  (uint32_t)&huart2.Instance->DR, strlen(msg1));
 		  huart2.Instance->CR3 |= USART_CR3_DMAT;
 
-		  /*
-		  HAL_DMA_Start(&hdma_usart2_rx, (uint32_t)&huart2.Instance->DR, (uint32_t)&LD2_GPIO_Port->ODR, 1);
-		  //Enable UART in DMA Mode
-		  huart2.Instance->CR3 |= USART_CR3_DMAR;
-		  */
-		  //error = HAL_UART_Receive_IT(&huart2, (uint8_t *) &rxBuffer, 4);
-		  //error = HAL_UART_Receive_DMA(&huart2, (uint8_t *) &rxBuffer, 4);
-		  //data = rxBuffer;
-		  //trace_printf("Error: %d\n", error);
-		  HAL_DMA_Start_IT(&hdma_usart2_rx, (uint32_t)&huart2.Instance->DR, (uint32_t)&rxBuffer, strlen(rxBuffer));
-		  //Enable UART in DMA Mode
-		  huart2.Instance->CR3 |= USART_CR3_DMAR;
-		  trace_printf(rxBuffer);
+
+		  trace_write((char*)rx_circular_buffer, 10);
+
 	  }
 
   }
