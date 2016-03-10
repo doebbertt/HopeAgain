@@ -15,8 +15,10 @@
 UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_tx;
 DMA_HandleTypeDef hdma_usart2_rx;
-char *msg = "Hello, Suk \r\n";
-char *msg1 = "mmh...Heisse Schnitte!:-)\r\n";
+char *RST = "AT+RST";
+char *CIPSTART = "AT+CIPSTART=""TCP"",""172.16.11.9"",33333";
+char *CIPSEND = "AT+CIPSEND=5";
+char *msg = "HELLO";
 #define size_of_rx_circular_buffer 128
 uint8_t rx_circular_buffer[size_of_rx_circular_buffer];
 uint8_t const * rx_tail_ptr;
@@ -42,7 +44,8 @@ void DMAReceivingComplete(DMA_HandleTypeDef *hdma);
 
  int main(void) {
   HAL_Init();
-  char     rxBuffer[32];
+  char rxBuffer[32];
+  char txBuffer[32];
 
   Nucleo_BSP_Init();
 
@@ -87,27 +90,39 @@ void DMAReceivingComplete(DMA_HandleTypeDef *hdma);
   HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
 
+  HAL_DMA_Start_IT(&hdma_usart2_tx,  (uint32_t)RST,  (uint32_t)&huart2.Instance->DR, strlen(RST));
+    huart2.Instance->CR3 |= USART_CR3_DMAT;
 
-  HAL_DMA_Start_IT(&hdma_usart2_tx,  (uint32_t)msg,  (uint32_t)&huart2.Instance->DR, strlen(msg));
+  HAL_Delay(3000);
+
+  HAL_DMA_Start_IT(&hdma_usart2_tx,  (uint32_t)CIPSTART,  (uint32_t)&huart2.Instance->DR, strlen(CIPSTART));
   huart2.Instance->CR3 |= USART_CR3_DMAT;
 
   /* Infinite loop */
-
 
   HAL_UART_Receive_DMA(&huart2, rx_circular_buffer, size_of_rx_circular_buffer);
 
   while (1)
   {
+	  //txBuffer[1] = USART_TX_Pin;
+	  //trace_write((char*)txBuffer, 20);
+	  //rxBuffer[1] = USART_RX_Pin;
+	  //trace_write((char*)rxBuffer, 20);
 
 	  if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) != GPIO_PIN_SET)
 	  {
 
 		  HAL_Delay(1000);
-		  HAL_DMA_Start_IT(&hdma_usart2_tx,  (uint32_t)msg1,  (uint32_t)&huart2.Instance->DR, strlen(msg1));
+		  HAL_DMA_Start_IT(&hdma_usart2_tx,  (uint32_t)CIPSEND,  (uint32_t)&huart2.Instance->DR, strlen(CIPSEND));
 		  huart2.Instance->CR3 |= USART_CR3_DMAT;
+		  trace_write((char*)CIPSEND, 13);
+		  HAL_Delay(2000);
+		  HAL_DMA_Start_IT(&hdma_usart2_tx,  (uint32_t)msg,  (uint32_t)&huart2.Instance->DR, strlen(msg));
+		  huart2.Instance->CR3 |= USART_CR3_DMAT;
+		  trace_write((char*)msg, 5);
 
+		  trace_write((char*)rx_circular_buffer, 20);
 
-		  trace_write((char*)rx_circular_buffer, 10);
 
 	  }
 
