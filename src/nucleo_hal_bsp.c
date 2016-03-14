@@ -118,6 +118,7 @@ void MX_GPIO_Init(void)
 void MX_DMA_Init(void)
 {
   /* DMA controller clock enable */
+
   __DMA1_CLK_ENABLE();
   __DMA2_CLK_ENABLE();
 }

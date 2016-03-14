@@ -58,7 +58,6 @@ __initialize_hardware(void)
   // Initialise the HAL Library; it must be the first function
   // to be executed before the call of any HAL function.
   HAL_Init();
-
   // Enable HSE Oscillator and activate PLL with HSE as source
   SystemClock_Config();
 
@@ -121,11 +120,11 @@ SystemClock_Config(void)
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   // 16 is the average calibration value, adjust for your own board.
-  RCC_OscInitStruct.HSICalibrationValue = 16;
+  RCC_OscInitStruct.HSICalibrationValue = 6;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   // This assumes the HSI_VALUE is a multiple of 1 MHz. If this is not
   // your case, you have to recompute these PLL constants.
-  RCC_OscInitStruct.PLL.PLLM = (HSI_VALUE/1000000u);
+  RCC_OscInitStruct.PLL.PLLM = 16;//(HSI_VALUE/1000000u);
 #endif
 
   RCC_OscInitStruct.PLL.PLLN = 336;
