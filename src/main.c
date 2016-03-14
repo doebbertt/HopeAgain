@@ -76,13 +76,26 @@ int main(void)
   MX_USART1_UART_Init();
   //MX_USART2_UART_Init();
 
-  HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)RST,  (uint32_t)&huart2.Instance->DR, strlen(RST));
-      huart2.Instance->CR3 |= USART_CR3_DMAT;
 
-  HAL_Delay(3000);
+  HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)RST,  (uint32_t)&huart1.Instance->DR, strlen(RST));
+      huart1.Instance->CR3 |= USART_CR3_DMAT;
+  trace_write((char*)RST, 6);
 
-  HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)CIPSTART,  (uint32_t)&huart2.Instance->DR, strlen(CIPSTART));
-      huart2.Instance->CR3 |= USART_CR3_DMAT;
+  HAL_UART_Receive_DMA(&huart1, rx_circular_buffer, size_of_rx_circular_buffer);
+
+  trace_write((char*)rx_circular_buffer, 20);
+  if(rx_circular_buffer[0] == 'O' && rx_circular_buffer[1] == 'K')
+  {
+	  HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)CIPSTART,  (uint32_t)&huart1.Instance->DR, strlen(CIPSTART));
+			huart1.Instance->CR3 |= USART_CR3_DMAT;
+	  trace_write((char*)CIPSTART, 41);
+
+
+  }
+
+  HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)CIPSTART,  (uint32_t)&huart1.Instance->DR, strlen(CIPSTART));
+      huart1.Instance->CR3 |= USART_CR3_DMAT;
+  trace_write((char*)CIPSTART, 41);
 
   HAL_UART_Receive_DMA(&huart1, rx_circular_buffer, size_of_rx_circular_buffer);
 
@@ -93,11 +106,11 @@ int main(void)
 	  if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) != GPIO_PIN_SET)
 	  	  {
 
-	  		  HAL_Delay(1000);
-	  		  HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)CIPSEND,  (uint32_t)&huart2.Instance->DR, strlen(CIPSEND));
-	  		  huart1.Instance->CR3 |= USART_CR3_DMAT;
-	  		  trace_write((char*)CIPSEND, 13);
-	  		  HAL_Delay(2000);
+	  		  //HAL_Delay(1000);
+	  		  //HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)CIPSEND,  (uint32_t)&huart1.Instance->DR, strlen(CIPSEND));
+	  		  //huart1.Instance->CR3 |= USART_CR3_DMAT;
+	  		  //trace_write((char*)CIPSEND, 13);
+	  		  //HAL_Delay(2000);
 	  		  HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)msg,  (uint32_t)&huart1.Instance->DR, strlen(msg));
 	  		  huart1.Instance->CR3 |= USART_CR3_DMAT;
 	  		  trace_write((char*)msg, 5);

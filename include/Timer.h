@@ -7,8 +7,25 @@
 #define TIMER_H_
 
 #include "cmsis_device.h"
+#include <stm32f401xe.h>
+#include <stdint-gcc.h>
+
+
+volatile uint32_t microseconds;
+
+typedef enum{
+	SECOND = 1,
+	MILLISEC = 1000,
+	MICROSEC= 1000000
+}Time_Resolution;
 
 // ----------------------------------------------------------------------------
+
+void Init_Time(Time_Resolution res);
+
+void Delay(uint16_t milliseconds);
+
+uint32_t Millis();
 
 #define TIMER_FREQUENCY_HZ (1000u)
 
