@@ -1,9 +1,10 @@
 
 #define ESP_ResponseTimeout_ms 6000
 #define ESP_USART USART1
+#define DEBUG_CMD_USART USART3
 
 //USART buffers and related
-#define size_of_rx_circular_buffer 1000
+#define RxBuffSize 1000
 #define USART_TxComplete_Timeout_ms 1000
 #define DMA_Rx_Buff_Poll_Int_ms 500
 

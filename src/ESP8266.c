@@ -13,7 +13,7 @@
 
 
 char *ESP_IPD_Data_Buffer_Pntr;
-char ESP_IPD_DataBuffer[size_of_rx_circular_buffer];
+char ESP_IPD_DataBuffer[RxBuffSize];
 
 
 char commandToSend[70];
@@ -21,7 +21,7 @@ volatile uint8_t waitingForReponse = 0;
 volatile uint8_t OKFound = 0;
 volatile uint8_t ERRORFound = 0;
 volatile uint32_t TxWaitForResponse_TimeStmp = 0;
-extern volatile char rx_circular_buffer[size_of_rx_circular_buffer];
+extern volatile char rx_circular_buffer[RxBuffSize];
 
 uint32_t dimmingValueToValidate = 30000; //Just a starting value that is outside the allowed
 
@@ -112,7 +112,7 @@ void Wifi_WaitForAnswerCMD(char *cmdToWaitFor, uint16_t cmdSize)
 
 	while(waitingForReponse == 1 && (Millis() - TxWaitForResponse_TimeStmp) < ESP_ResponseTimeout_ms)
 		{
-		WaitForAnswer_cmd_Buffer = memmem(rx_circular_buffer,size_of_rx_circular_buffer,cmdToWaitFor,cmdSize);
+		WaitForAnswer_cmd_Buffer = memmem(rx_circular_buffer,RxBuffSize,cmdToWaitFor,cmdSize);
 		if(strlen(WaitForAnswer_cmd_Buffer)>0)
 		{
 			if(WaitForAnswer_ans_Buffer = memmem(WaitForAnswer_cmd_Buffer, strlen(WaitForAnswer_cmd_Buffer),"OK\r\n",4)
@@ -136,7 +136,7 @@ void Wifi_WaitForAnswer_SEND_OK(uint16_t cmdSize)
 
 	while(waitingForReponse == 1 && (Millis() - TxWaitForResponse_TimeStmp) < ESP_ResponseTimeout_ms)
 	{
-		WaitForAnswer_cmd_Buffer = memmem(rx_circular_buffer,size_of_rx_circular_buffer,"AT+CIPSEND",10);
+		WaitForAnswer_cmd_Buffer = memmem(rx_circular_buffer,RxBuffSize,"AT+CIPSEND",10);
 		if(strlen(WaitForAnswer_cmd_Buffer)>0)
 		{
 			while(waitingForReponse == 1 && (Millis() - TxWaitForResponse_TimeStmp) < ESP_ResponseTimeout_ms)
@@ -171,7 +171,7 @@ void Wifi_SendCustomCommand(char *customMessage)
 			Wifi_WaitForAnswer();
 			//for (wi=0;wi<735000;wi++);
 }
-
+/*
 void Wifi_SendCustomCommand_External_Wait(char *customMessage)
 {
 		while(*customMessage)
@@ -190,7 +190,7 @@ void Wifi_SendCustomCommand_External_Wait(char *customMessage)
 			//Wifi_WaitForAnswer();
 			//for (wi=0;wi<735000;wi++);
 }
-
+*/
 //Waits to return untill wifi responds (OK or ERROR)
 void Wifi_SendCommand(Wifi_Commands command )
 {
@@ -198,7 +198,7 @@ void Wifi_SendCommand(Wifi_Commands command )
 
 	while(*commandToSend)
 	{
-		while(USART_GetFlagStatus(ESP_USART,USART_FLAG_TXE) == RESET);
+		while(USART_GetFlagStatus(ESP_USART, USART_FLAG_TXE) == RESET);
 		USART_SendData(ESP_USART,*commandToSend++);
 	}
 	Wifi_ReadyWaitForAnswer();
@@ -253,7 +253,7 @@ IPD_Data Wifi_CheckDMABuff_ForIPDData()
 	//		{
 				//Probably need to check for new client ({clientNum},CONNECT)
 				lastDMABuffPoll = Millis();
-				ESP_IPD_Data_Buffer_Pntr = memmem(rx_circular_buffer,size_of_rx_circular_buffer,"+IPD",4);
+				ESP_IPD_Data_Buffer_Pntr = memmem(rx_circular_buffer,RxBuffSize,"+IPD",4);
 				if(ESP_IPD_Data_Buffer_Pntr)
 				{
 					//position = DMA_GetCurrDataCounter(DMA1_Channel3);
@@ -265,7 +265,7 @@ IPD_Data Wifi_CheckDMABuff_ForIPDData()
 					//Wipes the received message from the DMA buffer (using the pointer to the data)
 					//This makes sure the data doesn't get mistaken for a new request, on the next buffer polling.
 					ClearArray_Size(ESP_IPD_Data_Buffer_Pntr,strlen(ESP_IPD_Data_Buffer_Pntr));
-					DMA_Initialize(rx_circular_buffer, size_of_rx_circular_buffer);
+					DMA_Initialize(rx_circular_buffer, RxBuffSize);
 
 
 					//now we process since DMA isn't going to stomp on us.

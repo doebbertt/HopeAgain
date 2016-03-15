@@ -167,6 +167,9 @@ void MX_USART1_UART_Init(void)
   huart1.Init.OverSampling = UART_OVERSAMPLING_16;
   HAL_UART_Init(&huart1);
 
+  // TODO: check
+  USART_Cmd(USART1,ENABLE);
+
 }
 
 /* USART2 init function */

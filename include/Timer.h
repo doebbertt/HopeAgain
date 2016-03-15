@@ -16,29 +16,20 @@ volatile uint32_t microseconds;
 typedef enum{
 	SECOND = 1,
 	MILLISEC = 1000,
-	MICROSEC= 1000000
+	MICROSEC = 1000000
 }Time_Resolution;
 
-// ----------------------------------------------------------------------------
 
 void Init_Time(Time_Resolution res);
 
 void Delay(uint16_t milliseconds);
 
+//uint32_t Micros();
+
 uint32_t Millis();
 
-#define TIMER_FREQUENCY_HZ (1000u)
 
-typedef uint32_t timer_ticks_t;
+//systick interrupt
 
-extern volatile timer_ticks_t timer_delayCount;
 
-extern void
-timer_start (void);
-
-extern void
-timer_sleep (timer_ticks_t ticks);
-
-// ----------------------------------------------------------------------------
-
-#endif // TIMER_H_
+#endif // _TIME_H_
