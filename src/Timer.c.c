@@ -1,3 +1,9 @@
+/********************************************************
+ * Author: SUK & Thomas
+ * Date: 03/14/2016
+ * esp8266.c (esp8266 wifi library source file)
+ ********************************************************/
+
 #include "Timer.h"
 
 volatile uint32_t millis = 0;
@@ -17,10 +23,12 @@ uint32_t Millis()
 return millis;
 }
 
+/* TODO
 void SysTick_Handler()
 {
 
 	millis++;
 }
+*/
 
 //

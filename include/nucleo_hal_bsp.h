@@ -1,9 +1,8 @@
-/*
- * nucleo-f030_hal_bsp.h
- *
- *  Created on: 25.02.2016
- *      Author: doebbert
- */
+/********************************************************
+ * Author: SUK & Thomas
+ * Date: 03/14/2016
+ * esp8266.c (esp8266 wifi library source file)
+ ********************************************************/
 
 #ifndef NUCLEO_HAL_BSP_H_
 #define NUCLEO_HAL_BSP_H_

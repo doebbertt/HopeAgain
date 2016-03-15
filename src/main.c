@@ -1,4 +1,8 @@
-
+/********************************************************
+ * Author: SUK & Thomas
+ * Date: 03/14/2016
+ * esp8266.c (esp8266 wifi library source file)
+ ********************************************************/
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 #include "nucleo_hal_bsp.h"
@@ -6,6 +10,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "diag/Trace.h"
+#include "ESP8266_conf.h"
+#include "ESP8266.h"
+#include "ESP8266_ll.h"
 
 /* USER CODE BEGIN Includes */
 

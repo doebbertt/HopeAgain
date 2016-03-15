@@ -20,6 +20,7 @@
 #include "buffer.h"
 #include "ESP8266.h"
 #include "ESP8266_ll.h"
+#include "ESP8266_conf.h"
 
 
 /* Standard C libraries */
