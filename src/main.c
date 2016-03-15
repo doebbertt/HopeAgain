@@ -26,6 +26,9 @@ char *msg = "HELLO";
 uint8_t rx_circular_buffer[size_of_rx_circular_buffer];
 uint8_t const * rx_tail_ptr;
 
+/* ESP8266 working structure */
+ESP8266_t ESP8266;
+
 DMA_HandleTypeDef hdma_memtomem_dma2_stream0;
 
 /* USER CODE BEGIN PV */
@@ -76,6 +79,10 @@ int main(void)
   MX_USART1_UART_Init();
   //MX_USART2_UART_Init();
 
+  /* Init ESP module */
+  	while (ESP8266_Init(&ESP8266, 115200) != ESP_OK) {
+  		printf("Problems with initializing module!\r\n");
+  	}
 
   HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)RST,  (uint32_t)&huart1.Instance->DR, strlen(RST));
       huart1.Instance->CR3 |= USART_CR3_DMAT;
