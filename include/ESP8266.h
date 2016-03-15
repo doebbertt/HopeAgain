@@ -17,22 +17,18 @@
 #include "stm32f4xx_hal_conf.h"
 #include "stm32f4xx_it.h"
 #include "nucleo_hal_bsp.h"
-#include "buffer.h"
 #include "ESP8266.h"
-#include "ESP8266_ll.h"
-#include "ESP8266_conf.h"
-
 
 /* Standard C libraries */
 #include "string.h"
 #include "stdio.h"
 #include "stdint.h"
 
-/* Low level based implementation
-#include "esp8266_ll.h" */
+/* Low level based implementation */
+#include "ESP8266_ll.h"
 
-/* Include configuration
-#include "esp8266_conf.h" */
+/* Include configuration */
+#include "ESP8266_conf.h"
 
 /* Buffer implementation */
 #include "buffer.h"

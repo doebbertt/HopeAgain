@@ -91,6 +91,7 @@ int main(void)
   		printf("Problems with initializing module!\r\n");
   	}
 
+
   HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)RST,  (uint32_t)&huart1.Instance->DR, strlen(RST));
       huart1.Instance->CR3 |= USART_CR3_DMAT;
   trace_write((char*)RST, 6);

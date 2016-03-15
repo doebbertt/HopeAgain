@@ -188,9 +188,9 @@ do {                                                        \
 /* Reset all connections */
 #define ESP8266_RESET_CONNECTIONS(ESP8266)                  memset(ESP8266->Connection, 0, sizeof(ESP8266->Connection));
 
-/******************************************/
-/*          Basic AT commands Set         */
-/******************************************/
+/********************************************************************************/
+/*          				Basic AT commands Set         						*/
+/********************************************************************************/
 ESP8266_Result_t ESP8266_Init(ESP8266_t* ESP8266, uint32_t baudrate) {
 	uint8_t i;
 
@@ -199,39 +199,40 @@ ESP8266_Result_t ESP8266_Init(ESP8266_t* ESP8266, uint32_t baudrate) {
 
 	/* Init temporary buffer */
 	if (BUFFER_Init(&TMP_Buffer, ESP8266_TMPBUFFER_SIZE, TMPBuffer)) {
-		/* Return from function */
+		// Return from function
 		ESP8266_RETURNWITHSTATUS(ESP8266, ESP_NOHEAP);
 	}
 
-	/* Init USART working */
+	/* Init USART working
 	if (BUFFER_Init(&USART_Buffer, ESP8266_USARTBUFFER_SIZE, USARTBuffer)) {
-		/* Return from function */
+		Return from function
 		ESP8266_RETURNWITHSTATUS(ESP8266, ESP_NOHEAP);
 	}
+	*/
 
-	/* Init RESET pin */
-	ESP8266_RESET_INIT;
+	/* Init RESET pin
+	ESP8266_RESET_INIT;*/
 
-	/* Set pin low */
-	ESP8266_RESET_LOW;
+	/* Set pin low
+	ESP8266_RESET_LOW;*/
 
-	/* Delay for while */
-	ESP8266_DELAYMS(ESP8266, 100);
+	/* Delay for while
+	ESP8266_DELAYMS(ESP8266, 100); */
 
-	/* Set pin high */
-	ESP8266_RESET_HIGH;
+	/* Set pin high
+	ESP8266_RESET_HIGH;*/
 
-	/* Delay for while */
-	ESP8266_DELAYMS(ESP8266, 100);
+	/* Delay for while
+	ESP8266_DELAYMS(ESP8266, 100); */
 
 	/* Save current baudrate */
 	ESP8266->Baudrate = baudrate;
 
-	/* Init USART */
-	ESP8266_LL_USARTInit(ESP8266->Baudrate);
+	/* Init USART
+	ESP8266_LL_USARTInit(ESP8266->Baudrate); */
 
-	/* Set allowed timeout */
-	ESP8266->Timeout = 1000;
+	/* Set allowed timeout
+	ESP8266->Timeout = 1000; */
 
 	/* Reset device */
 	SendCommand(ESP8266, ESP8266_COMMAND_RST, "AT+RST\r\n", "ready\r\n");
@@ -239,40 +240,40 @@ ESP8266_Result_t ESP8266_Init(ESP8266_t* ESP8266, uint32_t baudrate) {
 	/* Wait till idle */
 	ESP8266_WaitReady(ESP8266);
 
-	/* Check status */
+	/* Check status
 	if (!ESP8266->Flags.F.LastOperationStatus) {
-		/* Check for baudrate, try with predefined baudrates */
+		// Check for baudrate, try with predefined baudrates
 		for (i = 0; i < sizeof(ESP8266_Baudrate) / sizeof(ESP8266_Baudrate[0]); i++) {
-			/* Init USART */
+			// Init USART
 			ESP8266_LL_USARTInit(ESP8266->Baudrate);
 
-			/* Set allowed timeout */
+			// Set allowed timeout
 			ESP8266->Timeout = 1000;
 
-			/* Reset device */
+			// Reset device
 			SendCommand(ESP8266, ESP8266_COMMAND_RST, "AT+RST\r\n", "ready\r\n");
 
-			/* Wait till idle */
+			// Wait till idle
 			ESP8266_WaitReady(ESP8266);
 
-			/* Check status */
+			// Check status
 			if (ESP8266->Flags.F.LastOperationStatus) {
-				/* Save current baudrate */
+				// Save current baudrate
 				ESP8266->Baudrate = ESP8266_Baudrate[i];
 
 				break;
 			}
 		}
-	}
+	} */
 
-	/* Check status */
+	/* Check status
 	if (!ESP8266->Flags.F.LastOperationStatus) {
-		/* Device is not connected */
+		// Device is not connected
 		ESP8266_RETURNWITHSTATUS(ESP8266, ESP_DEVICENOTCONNECTED);
-	}
+	} */
 
-	/* Set allowed timeout to 30sec */
-	ESP8266->Timeout = ESP8266_TIMEOUT;
+	/* Set allowed timeout to 30sec
+	ESP8266->Timeout = ESP8266_TIMEOUT; */
 
 	/* Test device */
 	SendCommand(ESP8266, ESP8266_COMMAND_AT, "AT\r\n", "OK\r\n");
@@ -280,10 +281,10 @@ ESP8266_Result_t ESP8266_Init(ESP8266_t* ESP8266, uint32_t baudrate) {
 	/* Wait till idle */
 	ESP8266_WaitReady(ESP8266);
 
-	/* Check status */
+	/* Check status
 	if (!ESP8266->Flags.F.LastOperationStatus) {
 		ESP8266_RETURNWITHSTATUS(ESP8266, ESP_DEVICENOTCONNECTED);
-	}
+	} */
 
 #if ESP8266_ECHO
 	/* Enable echo if not already */
@@ -299,20 +300,20 @@ ESP8266_Result_t ESP8266_Init(ESP8266_t* ESP8266, uint32_t baudrate) {
 	/* Enable multiple connections */
 	while (ESP8266_SetMux(ESP8266, 1) != ESP_OK);
 
-	/* Enable IP and PORT to be shown on +IPD statement */
-	while (ESP8266_Setdinfo(ESP8266, 1) != ESP_OK);
+	/* Enable IP and PORT to be shown on +IPD statement
+	while (ESP8266_Setdinfo(ESP8266, 1) != ESP_OK); */
 
-	/* Set mode to STA+AP by default */
-	while (ESP8266_SetMode(ESP8266, ESP8266_Mode_STA_AP) != ESP_OK);
+	/* Set mode to STA+AP by default
+	while (ESP8266_SetMode(ESP8266, ESP8266_Mode_STA_AP) != ESP_OK); */
 
-	/* Get station MAC */
-	while (ESP8266_GetSTAMAC(ESP8266) != ESP_OK);
+	/* Get station MAC
+	while (ESP8266_GetSTAMAC(ESP8266) != ESP_OK); */
 
-	/* Get softAP MAC */
-	while (ESP8266_GetAPMAC(ESP8266) != ESP_OK);
+	/* Get softAP MAC
+	while (ESP8266_GetAPMAC(ESP8266) != ESP_OK); */
 
-	/* Get softAP MAC */
-	while (ESP8266_GetAPIP(ESP8266) != ESP_OK);
+	/* Get softAP MAC
+	while (ESP8266_GetAPIP(ESP8266) != ESP_OK); */
 
 	/* Return OK */
 	return ESP8266_WaitReady(ESP8266);

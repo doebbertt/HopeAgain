@@ -145,7 +145,7 @@ void TIMER_INTERRUPT_FUNCTION_NAME(void) {
  */
 
 /* Include ESP layer */
-#include "esp8266.h"
+#include "ESP8266.h"
 
 /**
  * @brief  Initializes U(S)ART peripheral for ESP8266 communication
