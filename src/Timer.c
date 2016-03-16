@@ -1,6 +1,7 @@
-#include "Time.h"
+#include "Timer.h"
 
-volatile uint32_t millis = 0;
+//volatile uint32_t millis = 0;
+
 
 void Init_Time(Time_Resolution res)
 {
@@ -22,6 +23,7 @@ uint32_t Micros()
 {
 }
 */
+/*
 uint32_t Millis()
 {
 return millis;
@@ -32,3 +34,4 @@ void SysTick_Handler()
 
 	millis++;
 }
+*/

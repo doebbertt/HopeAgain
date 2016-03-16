@@ -10,6 +10,7 @@
 #include "stm32f4xx_hal_conf.h"
 #include "stm32f4xx_it.h"
 #include "nucleo_hal_bsp.h"
+#include "stm32f4xx_hal_usart.h"
 
 
 char *ESP_IPD_Data_Buffer_Pntr;
@@ -115,7 +116,8 @@ void Wifi_WaitForAnswerCMD(char *cmdToWaitFor, uint16_t cmdSize)
 		WaitForAnswer_cmd_Buffer = memmem(rx_circular_buffer,RxBuffSize,cmdToWaitFor,cmdSize);
 		if(strlen(WaitForAnswer_cmd_Buffer)>0)
 		{
-			if(WaitForAnswer_ans_Buffer = memmem(WaitForAnswer_cmd_Buffer, strlen(WaitForAnswer_cmd_Buffer),"OK\r\n",4)
+
+			if(WaitForAnswer_ans_Buffer == memmem(WaitForAnswer_cmd_Buffer, strlen(WaitForAnswer_cmd_Buffer),"OK\r\n",4))
 			{
 				ClearArray_Size(WaitForAnswer_cmd_Buffer, strlen(WaitForAnswer_cmd_Buffer));
 				OKFound=1;
@@ -141,7 +143,7 @@ void Wifi_WaitForAnswer_SEND_OK(uint16_t cmdSize)
 		{
 			while(waitingForReponse == 1 && (Millis() - TxWaitForResponse_TimeStmp) < ESP_ResponseTimeout_ms)
 				{
-				if(WaitForAnswer_ans_Buffer = memmem(rx_circular_buffer,strlen(rx_circular_buffer),"SEND OK\r\n",9))
+				if(WaitForAnswer_ans_Buffer == memmem(rx_circular_buffer,strlen(rx_circular_buffer),"SEND OK\r\n",9))
 				{
 					pointerRange = WaitForAnswer_cmd_Buffer - WaitForAnswer_ans_Buffer;
 					ClearArray_Size(WaitForAnswer_cmd_Buffer, cmdSize + 9);
@@ -171,7 +173,7 @@ void Wifi_SendCustomCommand(char *customMessage)
 			Wifi_WaitForAnswer();
 			//for (wi=0;wi<735000;wi++);
 }
-/*
+
 void Wifi_SendCustomCommand_External_Wait(char *customMessage)
 {
 		while(*customMessage)
@@ -190,7 +192,7 @@ void Wifi_SendCustomCommand_External_Wait(char *customMessage)
 			//Wifi_WaitForAnswer();
 			//for (wi=0;wi<735000;wi++);
 }
-*/
+
 //Waits to return untill wifi responds (OK or ERROR)
 void Wifi_SendCommand(Wifi_Commands command )
 {
@@ -260,7 +262,7 @@ IPD_Data Wifi_CheckDMABuff_ForIPDData()
 					//position = strlen(rx_circular_buffer);
 					//Copy IPD message and data to its own buffer so DMA can go about its business
 					strcpy(ESP_IPD_DataBuffer,ESP_IPD_Data_Buffer_Pntr);
-					DMA_Cmd(DMA1_Channel3,DISABLE);
+					DMA_Cmd(DMA_CHANNEL_4,DISABLE);
 
 					//Wipes the received message from the DMA buffer (using the pointer to the data)
 					//This makes sure the data doesn't get mistaken for a new request, on the next buffer polling.

@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include "diag/Trace.h"
 #include "ESP8266.h"
+#include "stm32f4xx_hal_usart.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -23,9 +24,11 @@ char *RST = "AT+RST";
 char *CIPSTART = "AT+CIPSTART=""TCP"",""172.16.11.6"",33333";
 char *CIPSEND = "AT+CIPSEND=5";
 char *msg = "HELLO";
-#define size_of_rx_circular_buffer 128
-uint8_t rx_circular_buffer[size_of_rx_circular_buffer];
+uint8_t rx_circular_buffer[RxBuffSize];
 uint8_t const * rx_tail_ptr;
+volatile extern uint8_t waitingForResponse;
+uint8_t TxCounter = 0;
+
 
 DMA_HandleTypeDef hdma_memtomem_dma2_stream0;
 
@@ -82,9 +85,10 @@ int main(void)
       huart1.Instance->CR3 |= USART_CR3_DMAT;
   trace_write((char*)RST, 6);
 
-  HAL_UART_Receive_DMA(&huart1, rx_circular_buffer, size_of_rx_circular_buffer);
+  HAL_UART_Receive_DMA(&huart1, rx_circular_buffer, RxBuffSize);
 
   trace_write((char*)rx_circular_buffer, 20);
+
   if(rx_circular_buffer[0] == 'O' && rx_circular_buffer[1] == 'K')
   {
 	  HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)CIPSTART,  (uint32_t)&huart1.Instance->DR, strlen(CIPSTART));
@@ -98,7 +102,7 @@ int main(void)
       huart1.Instance->CR3 |= USART_CR3_DMAT;
   trace_write((char*)CIPSTART, 41);
 
-  HAL_UART_Receive_DMA(&huart1, rx_circular_buffer, size_of_rx_circular_buffer);
+  HAL_UART_Receive_DMA(&huart1, rx_circular_buffer, RxBuffSize);
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -112,8 +116,9 @@ int main(void)
 	  		  //huart1.Instance->CR3 |= USART_CR3_DMAT;
 	  		  //trace_write((char*)CIPSEND, 13);
 	  		  //HAL_Delay(2000);
-	  		  HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)msg,  (uint32_t)&huart1.Instance->DR, strlen(msg));
-	  		  huart1.Instance->CR3 |= USART_CR3_DMAT;
+	  		  //HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)msg,  (uint32_t)&huart1.Instance->DR, strlen(msg));
+	  		  //huart1.Instance->CR3 |= USART_CR3_DMAT;
+		  	  Wifi_SendCommand(1);
 	  		  trace_write((char*)msg, 5);
 
 	  		  trace_write((char*)rx_circular_buffer, 20);
@@ -168,7 +173,7 @@ void MX_USART1_UART_Init(void)
   HAL_UART_Init(&huart1);
 
   // TODO: check
-  USART_Cmd(USART1,ENABLE);
+  //USART_Cmd(USART1,ENABLE);
 
 }
 

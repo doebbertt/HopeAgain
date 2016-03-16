@@ -9,6 +9,7 @@
 #include "cmsis_device.h"
 #include <stm32f401xe.h>
 #include <stdint-gcc.h>
+#include <stdint-gcc.h>
 
 
 volatile uint32_t microseconds;
