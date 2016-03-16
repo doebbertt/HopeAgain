@@ -10,4 +10,5 @@
 
 void Nucleo_BSP_Init() ;
 
+
 #endif /* NUCLEO_F030_HAL_BSP_H_ */

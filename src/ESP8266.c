@@ -16,6 +16,14 @@
 char *ESP_IPD_Data_Buffer_Pntr;
 char ESP_IPD_DataBuffer[RxBuffSize];
 
+UART_HandleTypeDef huart1;
+UART_HandleTypeDef huart2;
+DMA_HandleTypeDef hdma_usart1_rx;
+DMA_HandleTypeDef hdma_usart1_tx;
+DMA_HandleTypeDef hdma_usart2_rx;
+DMA_HandleTypeDef hdma_usart2_tx;
+DMA_HandleTypeDef hdma_memtomem_dma2_stream0;
+
 
 char commandToSend[70];
 volatile uint8_t waitingForReponse = 0;
@@ -203,18 +211,22 @@ void Wifi_SendCommand(Wifi_Commands command )
 	{
 		//while(HAL_USART_TxCpltCallback(huart1))
 		//USART_SendData(huart1,*commandToSend++);
-		while(USART_GetFlagStatus(ESP_USART, USART_FLAG_TXE) == RESET)
-		USART_SendData(ESP_USART,*commandToSend++);
+		while(__HAL_USART_GET_IT_SOURCE(&huart1, USART_FLAG_TXE) == RESET)
+		{
+			HAL_DMA_Start_IT(&hdma_usart1_tx, ATCommandsArray[command],  (uint32_t)&huart1.Instance->DR, strlen(ATCommandsArray[command]));
+				huart1.Instance->CR3 |= USART_CR3_DMAT;
+		//USART_SendData(ESP_USART,*commandToSend++);
+		}
 	}
 	Wifi_ReadyWaitForAnswer();
 
-	while(USART_GetFlagStatus(ESP_USART, USART_FLAG_TXE) == RESET);
-	USART_SendData(ESP_USART,'\r');
+	while(__HAL_USART_GET_IT_SOURCE(&huart1, USART_FLAG_TXE) == RESET);
+	USART_SendData(&huart1,'\r');
 
 	//Wifi_ReadyWaitForAnswer();
-	while(USART_GetFlagStatus(ESP_USART, USART_FLAG_TXE) == RESET);
+	while(__HAL_USART_GET_IT_SOURCE(&huart1, USART_FLAG_TXE) == RESET);
 
-	USART_SendData(ESP_USART,'\n');
+	USART_SendData(&huart1,'\n');
 
 	Wifi_WaitForAnswerCMD(ATCommandsArray[command], strlen(ATCommandsArray[command]));
 	//for (wi=0;wi<735000;wi++);
