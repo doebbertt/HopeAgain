@@ -203,8 +203,8 @@ void Wifi_SendCommand(Wifi_Commands command )
 	{
 		//while(HAL_USART_TxCpltCallback(huart1))
 		//USART_SendData(huart1,*commandToSend++);
-		//while(HAL_USART_GET_FLAG(huart1, USART_FLAG_TXE) == RESET)
-		//USART_SendData(ESP_USART,*commandToSend++);
+		while(USART_GetFlagStatus(ESP_USART, USART_FLAG_TXE) == RESET)
+		USART_SendData(ESP_USART,*commandToSend++);
 	}
 	Wifi_ReadyWaitForAnswer();
 

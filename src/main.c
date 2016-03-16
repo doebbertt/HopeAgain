@@ -21,6 +21,7 @@ DMA_HandleTypeDef hdma_usart1_tx;
 DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 DMA_HandleTypeDef hdma_memtomem_dma2_stream0;
+uint8_t rx_circular_buffer[RxBuffSize];
 char *AT = "AT";
 char *RST = "AT+RST";
 char *CIPSTART = "AT+CIPSTART=""TCP"",""172.16.11.6"",33333";
@@ -42,9 +43,6 @@ uint8_t TxCounter = 0;
 
 int main(void)
 {
-	HAL_Init();
-	char rxBuffer[32];
-	char txBuffer[32];
 
 	Nucleo_BSP_Init();
 
@@ -57,17 +55,6 @@ int main(void)
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
-  /* Configure the system clock */
-  SystemClock_Config();
-
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_DMA_Init();
-  MX_USART1_UART_Init();
-  //MX_USART2_UART_Init();
-
-
   /*
   HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)RST,  (uint32_t)&huart1.Instance->DR, strlen(RST));
       huart1.Instance->CR3 |= USART_CR3_DMAT;
@@ -112,7 +99,7 @@ int main(void)
 				  uint_fast8_t found = 0;
 				  while(__HAL_USART_GET_IT_SOURCE(&huart1, USART_IT_TXE) == RESET)
 				  {
-					  HAL_DMA_Start_IT(&hdma_usart1_tx,  ATCommands[n],  (uint32_t)&huart1.Instance->DR, strlen(AT));
+					  HAL_DMA_Start_IT(&hdma_usart1_tx, ATCommandsArray[n],  (uint32_t)&huart1.Instance->DR, strlen(AT));
 						huart1.Instance->CR3 |= USART_CR3_DMAT;
 						trace_write((char*)rx_circular_buffer, 20);
 						if(strcmp(rx_circular_buffer, "OK\r\n") == 0){ // rx_circular_buffer[0] == 'O' && rx_circular_buffer[1] == 'K'){
