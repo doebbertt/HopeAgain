@@ -79,7 +79,7 @@ const char *ESP_Responses[10] =
 		"ready",
 		"Link",
 		"Unlink",
-		"OK",
+		"OK\r\n",
 		"SEND OK",
 		"+IPD",
 		"ERROR",
@@ -117,23 +117,16 @@ char *WaitForAnswer_cmd_Buffer;
 char *WaitForAnswer_ans_Buffer;
 ///Will parse the USART buffer periodically (based on #defined poll interval) for the echo of cmdToWaitFor
 ///in the response from the ESP8266 module.
-void Wifi_WaitForAnswerCMD(char *cmdToWaitFor, uint16_t cmdSize)
+void Wifi_WaitForAnswerCMD(char *cmdToWaitFor, uint16_t *cmdSize)
 {
 
 	while(waitingForReponse == 1 && (Millis() - TxWaitForResponse_TimeStmp) < ESP_ResponseTimeout_ms)
 		{
-		WaitForAnswer_cmd_Buffer = memmem(rx_circular_buffer,RxBuffSize,cmdToWaitFor,cmdSize);
-		if(strcmp(rx_circular_buffer, ESP_Responses[0]) == 0)
+		WaitForAnswer_cmd_Buffer = memmem(rx_circular_buffer,strlen(rx_circular_buffer),ESP_Responses[3],strlen(ESP_Responses[3]));
+		if(WaitForAnswer_cmd_Buffer != NULL)
 		{
-
-			if(WaitForAnswer_ans_Buffer == memmem(WaitForAnswer_cmd_Buffer, strlen(WaitForAnswer_cmd_Buffer),"OK\r\n",4))
-			{
-				ClearArray_Size(WaitForAnswer_cmd_Buffer, strlen(WaitForAnswer_cmd_Buffer));
-				OKFound=1;
-				waitingForReponse = 0;
-			}
-			//Check for OK or Error Message
-
+			OKFound=1;
+			waitingForReponse = 0;
 		}
 
 		};
