@@ -1,3 +1,6 @@
+#ifndef MXCONSTANTS_H_
+#define MXCONSTANTS_H_
+
 
 #define ESP_ResponseTimeout_ms 6000
 #define ESP_USART USART1
@@ -44,3 +47,5 @@
 */ 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
+#endif // MXCONSTANTS_H_

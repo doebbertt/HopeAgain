@@ -20,17 +20,14 @@ DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart1_tx;
 DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
+DMA_HandleTypeDef hdma_memtomem_dma2_stream0;
+char *AT = "AT";
 char *RST = "AT+RST";
 char *CIPSTART = "AT+CIPSTART=""TCP"",""172.16.11.6"",33333";
 char *CIPSEND = "AT+CIPSEND=5";
 char *msg = "HELLO";
-uint8_t rx_circular_buffer[RxBuffSize];
-uint8_t const * rx_tail_ptr;
-volatile extern uint8_t waitingForResponse;
+//volatile extern uint8_t waitingForResponse;
 uint8_t TxCounter = 0;
-
-
-DMA_HandleTypeDef hdma_memtomem_dma2_stream0;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -38,20 +35,10 @@ DMA_HandleTypeDef hdma_memtomem_dma2_stream0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
-static void MX_USART1_UART_Init(void);
-//static void MX_USART2_UART_Init(void);
+
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-
-/* USER CODE END PFP */
-
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
 
 int main(void)
 {
@@ -81,6 +68,7 @@ int main(void)
   //MX_USART2_UART_Init();
 
 
+  /*
   HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)RST,  (uint32_t)&huart1.Instance->DR, strlen(RST));
       huart1.Instance->CR3 |= USART_CR3_DMAT;
   trace_write((char*)RST, 6);
@@ -101,7 +89,7 @@ int main(void)
   HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)CIPSTART,  (uint32_t)&huart1.Instance->DR, strlen(CIPSTART));
       huart1.Instance->CR3 |= USART_CR3_DMAT;
   trace_write((char*)CIPSTART, 41);
-
+	*/
   HAL_UART_Receive_DMA(&huart1, rx_circular_buffer, RxBuffSize);
 
   /* Infinite loop */
@@ -118,8 +106,35 @@ int main(void)
 	  		  //HAL_Delay(2000);
 	  		  //HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)msg,  (uint32_t)&huart1.Instance->DR, strlen(msg));
 	  		  //huart1.Instance->CR3 |= USART_CR3_DMAT;
-		  	  Wifi_SendCommand(1);
-	  		  trace_write((char*)msg, 5);
+		  	  //checks if the command was send
+		  	  uint_fast8_t n = 0;
+		  	  //for(n=0; n<15; n++){
+				  uint_fast8_t found = 0;
+				  while(__HAL_USART_GET_IT_SOURCE(&huart1, USART_IT_TXE) == RESET)
+				  {
+					  HAL_DMA_Start_IT(&hdma_usart1_tx,  ATCommands[n],  (uint32_t)&huart1.Instance->DR, strlen(AT));
+						huart1.Instance->CR3 |= USART_CR3_DMAT;
+						trace_write((char*)rx_circular_buffer, 20);
+						if(strcmp(rx_circular_buffer, "OK\r\n") == 0){ // rx_circular_buffer[0] == 'O' && rx_circular_buffer[1] == 'K'){
+							found = 1;
+							n++;
+						}else{
+							trace_write((char*)rx_circular_buffer && (char*)"ESP module not responding", 30);
+						}
+				  }
+		  	  //}
+
+		  	  if(found == 1){
+		  		memset(rx_circular_buffer, '\0', RxBuffSize);
+		  		found = 0;
+		  	  }
+		  	  while(__HAL_USART_GET_IT_SOURCE(&huart1, USART_IT_TXE) == RESET)
+			  {
+		  		  HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)RST,  (uint32_t)&huart1.Instance->DR, strlen(RST));
+					huart1.Instance->CR3 |= USART_CR3_DMAT;
+					trace_write((char*)rx_circular_buffer, 20);
+			  }
+
 
 	  		  trace_write((char*)rx_circular_buffer, 20);
 
@@ -158,112 +173,6 @@ void SystemClock_Config(void)
 }
 */
 
-/* USART1 init function */
-void MX_USART1_UART_Init(void)
-{
-
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  HAL_UART_Init(&huart1);
-
-  // TODO: check
-  //USART_Cmd(USART1,ENABLE);
-
-}
-
-/* USART2 init function */
-void MX_USART2_UART_Init(void)
-{
-
-  huart2.Instance = USART2;
-  huart2.Init.BaudRate = 115200;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  HAL_UART_Init(&huart2);
-
-}
-
-/** 
-  * Enable DMA controller clock
-  * Configure DMA for memory to memory transfers
-  *   hdma_memtomem_dma2_stream0
-  */
-void MX_DMA_Init(void) 
-{
-  /* DMA controller clock enable */
-  __DMA2_CLK_ENABLE();
-  __DMA1_CLK_ENABLE();
-
-  /* Configure DMA request hdma_memtomem_dma2_stream0 on DMA2_Stream0 */
-  hdma_memtomem_dma2_stream0.Instance = DMA2_Stream0;
-  hdma_memtomem_dma2_stream0.Init.Channel = DMA_CHANNEL_0;
-  hdma_memtomem_dma2_stream0.Init.Direction = DMA_MEMORY_TO_MEMORY;
-  hdma_memtomem_dma2_stream0.Init.PeriphInc = DMA_PINC_ENABLE;
-  hdma_memtomem_dma2_stream0.Init.MemInc = DMA_MINC_ENABLE;
-  hdma_memtomem_dma2_stream0.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-  hdma_memtomem_dma2_stream0.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-  hdma_memtomem_dma2_stream0.Init.Mode = DMA_NORMAL;
-  hdma_memtomem_dma2_stream0.Init.Priority = DMA_PRIORITY_LOW;
-  hdma_memtomem_dma2_stream0.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
-  hdma_memtomem_dma2_stream0.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
-  hdma_memtomem_dma2_stream0.Init.MemBurst = DMA_MBURST_SINGLE;
-  hdma_memtomem_dma2_stream0.Init.PeriphBurst = DMA_PBURST_SINGLE;
-  HAL_DMA_Init(&hdma_memtomem_dma2_stream0);
-
-  /* DMA interrupt init */
-  HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
-  HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
-  HAL_NVIC_SetPriority(DMA2_Stream5_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA2_Stream5_IRQn);
-  HAL_NVIC_SetPriority(DMA2_Stream7_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
-
-}
-
-/** Configure pins as 
-        * Analog 
-        * Input 
-        * Output
-        * EVENT_OUT
-        * EXTI
-*/
-void MX_GPIO_Init(void)
-{
-
-  GPIO_InitTypeDef GPIO_InitStruct;
-
-  /* GPIO Ports Clock Enable */
-  __GPIOC_CLK_ENABLE();
-  __GPIOH_CLK_ENABLE();
-  __GPIOA_CLK_ENABLE();
-  __GPIOB_CLK_ENABLE();
-
-  /*Configure GPIO pin : B1_Pin */
-  GPIO_InitStruct.Pin = B1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_EVT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : LD2_Pin */
-  GPIO_InitStruct.Pin = LD2_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
-  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
-
-}
 
 /* USER CODE BEGIN 4 */
 
