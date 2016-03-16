@@ -54,7 +54,7 @@ IPD_Data ProcessIPD_Data(char *IPD_Buffer);
 
 
 
-const char *ATCommandsArray[18] = {"AT",
+const char *ATCommandsArray[18] = {"AT\r\n",
 	"AT+CIPSTATUS",
 	"AT+CWLAP",
 	"AT+GMR",
@@ -123,7 +123,7 @@ void Wifi_WaitForAnswerCMD(char *cmdToWaitFor, uint16_t cmdSize)
 	while(waitingForReponse == 1 && (Millis() - TxWaitForResponse_TimeStmp) < ESP_ResponseTimeout_ms)
 		{
 		WaitForAnswer_cmd_Buffer = memmem(rx_circular_buffer,RxBuffSize,cmdToWaitFor,cmdSize);
-		if(strlen(WaitForAnswer_cmd_Buffer)>0)
+		if(strcmp(rx_circular_buffer, ESP_Responses[0]) == 0)
 		{
 
 			if(WaitForAnswer_ans_Buffer == memmem(WaitForAnswer_cmd_Buffer, strlen(WaitForAnswer_cmd_Buffer),"OK\r\n",4))
@@ -203,31 +203,31 @@ void Wifi_SendCustomCommand_External_Wait(char *customMessage)
 }
 
 //Waits to return untill wifi responds (OK or ERROR)
-void Wifi_SendCommand(Wifi_Commands command )
+void Wifi_SendCommand(Wifi_Commands command)
 {
-	const char *commandToSend = ATCommandsArray[command];
 
-	while(*commandToSend)
+	//while(HAL_USART_TxCpltCallback(huart1))
+	//USART_SendData(huart1,*commandToSend++);
+	while(__HAL_USART_GET_IT_SOURCE(&huart1, USART_FLAG_TXE) == RESET)
 	{
-		//while(HAL_USART_TxCpltCallback(huart1))
-		//USART_SendData(huart1,*commandToSend++);
-		while(__HAL_USART_GET_IT_SOURCE(&huart1, USART_FLAG_TXE) == RESET)
-		{
-			HAL_DMA_Start_IT(&hdma_usart1_tx, ATCommandsArray[command],  (uint32_t)&huart1.Instance->DR, strlen(ATCommandsArray[command]));
-				huart1.Instance->CR3 |= USART_CR3_DMAT;
-		//USART_SendData(ESP_USART,*commandToSend++);
-		}
+		HAL_DMA_Start_IT(&hdma_usart1_tx, ATCommandsArray[command],  (uint32_t)&huart1.Instance->DR, strlen(ATCommandsArray[command]));
+			huart1.Instance->CR3 |= USART_CR3_DMAT;
+			//*commandToSend++;
+	//USART_SendData(ESP_USART,*commandToSend++);
 	}
+
 	Wifi_ReadyWaitForAnswer();
 
+	/*
 	while(__HAL_USART_GET_IT_SOURCE(&huart1, USART_FLAG_TXE) == RESET);
-	USART_SendData(&huart1,'\r');
+	HAL_DMA_Start_IT(&huart1,'\r', (uint32_t)&huart1.Instance->DR, strlen('\r'));
+		huart1.Instance->CR3 |= USART_CR3_DMAT;
 
 	//Wifi_ReadyWaitForAnswer();
 	while(__HAL_USART_GET_IT_SOURCE(&huart1, USART_FLAG_TXE) == RESET);
-
-	USART_SendData(&huart1,'\n');
-
+	HAL_DMA_Start_IT(&huart1,'\n', (uint32_t)&huart1.Instance->DR, strlen('\n'));
+		huart1.Instance->CR3 |= USART_CR3_DMAT;
+	*/
 	Wifi_WaitForAnswerCMD(ATCommandsArray[command], strlen(ATCommandsArray[command]));
 	//for (wi=0;wi<735000;wi++);
 
