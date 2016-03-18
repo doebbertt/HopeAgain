@@ -79,7 +79,6 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart1)
     hdma_usart1_tx.Init.PeriphBurst = DMA_PBURST_SINGLE;
     hdma_usart1_rx.XferCpltCallback = &DMAReceivingComplete;
     HAL_DMA_Init(&hdma_usart1_rx);
-    //DMA_Cmd(&hdma_usart1_rx, ENABLE);
 
     __HAL_LINKDMA(huart1,hdmarx,hdma_usart1_rx);
 

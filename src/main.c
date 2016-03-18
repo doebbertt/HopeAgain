@@ -85,10 +85,12 @@ int main(void)
   {
 	  if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) != GPIO_PIN_SET)
 	  	  {
-		  	  //Wifi_SendCommand(WIFI_CHECK_MODULE_CONNECTION);
+		  	  //HAL_DMA_Start_IT(&hdma_usart1_rx, (uint32_t)&huart1.Instance->DR, rx_circular_buffer, strlen(rx_circular_buffer));
+		  	  Wifi_SendCommand(WIFI_CHECK_MODULE_CONNECTION);
 		  	  //Wifi_SendCommand(WIFI_MODULE_RESET);
 		  	  Wifi_SendCommand(WIFI_START_CLIENT_CONN);
-		  	  Wifi_SendCommand(WIFI_CHECK_MODULE_CONNECTION);
+		  	  //HAL_DMA_Start_IT(&hdma_usart1_rx, (uint32_t)&huart1.Instance->DR, rx_circular_buffer, strlen(rx_circular_buffer));
+		  	  //Wifi_SendCommand(WIFI_CHECK_MODULE_CONNECTION);
 	  		  //HAL_Delay(1000);
 	  		  //HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)CIPSEND,  (uint32_t)&huart1.Instance->DR, strlen(CIPSEND));
 	  		  //huart1.Instance->CR3 |= USART_CR3_DMAT;

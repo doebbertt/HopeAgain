@@ -82,17 +82,17 @@ const char *ATCommandsArray[18] = {"AT\r\n",
 
 const char *ESP_Responses[11] =
 {
-		"ready\r\n",
-		"Link\r\n",
-		"Unlink\r\n",
-		"OK\r\n",
-		"SEND OK\r\n",
-		"+IPD\r\n",
-		"ERROR\r\n",
-		"wrong syntax\r\n",
-		"busy p...\r\n",
-		"busy inet...\r\n",
-		"Already Connected\r\n\r\n"
+		"ready",
+		"Link",
+		"Unlink",
+		"OK",
+		"SEND OK",
+		"+IPD",
+		"ERROR",
+		"wrong syntax",
+		"busy p...",
+		"busy inet...",
+		"ALREADY CONNECTED"
 };
 
 void ClearArray_Size(char buffer[], uint16_t size)
@@ -123,37 +123,64 @@ void Wifi_WaitForAnswer()
 char *WaitForAnswer_cmd_Buffer;
 char *WaitForAnswer_ans_Buffer;
 char *WaitForAnswer_AlreadyConn;
+char rx_circular_bufferTMP[100];
 ///Will parse the USART buffer periodically (based on #defined poll interval) for the echo of cmdToWaitFor
 ///in the response from the ESP8266 module.
 void Wifi_WaitForAnswerCMD(char *cmdToWaitFor, uint16_t *cmdSize)
 {
 
 	while(waitingForReponse == 1 && (Millis() - TxWaitForResponse_TimeStmp) < ESP_ResponseTimeout_ms)
-		{
+	{
 		hdma_usart1_rx.StreamIndex;
 		huart1.Instance;
-		WaitForAnswer_cmd_Buffer = memmem(rx_circular_buffer, strlen(rx_circular_buffer), ESP_Responses[3],strlen(ESP_Responses[3]));
-		WaitForAnswer_ans_Buffer = memmem(rx_circular_buffer, strlen(rx_circular_buffer), ESP_Responses[6],strlen(ESP_Responses[6]));
-		WaitForAnswer_AlreadyConn = memmem(rx_circular_buffer, strlen(rx_circular_buffer), ESP_Responses[10],strlen(ESP_Responses[10]));
+		huart1.RxXferCount;
+		huart1.RxXferSize;
+		int found = 0;
+		char tmp = "";
+		char tmp2 = "";
+		uint8_t n = cmdSize;
+		uint8_t rxCount = 0;
+		while(found != 1){
+			tmp = *(huart1.pRxBuffPtr + n);
+			if(tmp == '\0'){
+				found = 1;
+			}else if (tmp == '\r'){
+				n++;
+			}else if(tmp == '\n'){
+				n++;
+			}else{
+				rx_circular_bufferTMP[rxCount] = tmp;
+				rxCount++;
+				n++;
+			}
+		}
+
+		trace_write((char*)rx_circular_bufferTMP, rxCount);
+		//uint8_t pointer = huart1.pRxBuffPtr + 1;
+
+		//tmp = *(huart1.pRxBuffPtr + 2);
+		huart1.hdmarx->StreamIndex;
+		WaitForAnswer_cmd_Buffer = memmem(rx_circular_bufferTMP, strlen(rx_circular_bufferTMP), ESP_Responses[3],strlen(ESP_Responses[3]));
+		WaitForAnswer_ans_Buffer = memmem(rx_circular_bufferTMP, strlen(rx_circular_bufferTMP), ESP_Responses[6],strlen(ESP_Responses[6]));
+		WaitForAnswer_AlreadyConn = memmem(rx_circular_bufferTMP, strlen(rx_circular_bufferTMP), ESP_Responses[10],strlen(ESP_Responses[10]));
 		if(WaitForAnswer_cmd_Buffer != NULL)
 		{
 			OKFound=1;
 			waitingForReponse = 0;
-			trace_write((char*)rx_circular_buffer, WaitForAnswer_cmd_Buffer);
-			ClearArray_Size(rx_circular_buffer, RxBuffSize);
-			huart1.RxXferCount;
+			trace_write((char*)rx_circular_bufferTMP, 20);
+			ClearArray_Size(rx_circular_bufferTMP, 100);
 		}else if(WaitForAnswer_AlreadyConn != NULL)
 		{
 			OKFound=1;
 			waitingForReponse = 0;
-			trace_write((char*)rx_circular_buffer, RxBuffSize);
-			ClearArray_Size(rx_circular_buffer, RxBuffSize);
+			trace_write((char*)rx_circular_bufferTMP, rxCount);
+			ClearArray_Size(rx_circular_bufferTMP, 100);
 		}else if(WaitForAnswer_ans_Buffer != NULL){
 			//trace_printf("Error:ESP module not responding -> rx_circular_buffer:");
 			trace_printf("Error:ESP module not responding -> rx_circular_buffer:");
-			trace_write((char*)rx_circular_buffer, RxBuffSize);
+			trace_write((char*)rx_circular_bufferTMP, 20);
 			waitingForReponse = 0;
-			ClearArray_Size(rx_circular_buffer, RxBuffSize);
+			ClearArray_Size(rx_circular_bufferTMP, 100);
 		}
 		};
 	OKFound=0;
@@ -166,15 +193,16 @@ void Wifi_WaitForAnswer_SEND_OK(uint16_t cmdSize)
 
 	while(waitingForReponse == 1 && (Millis() - TxWaitForResponse_TimeStmp) < ESP_ResponseTimeout_ms)
 	{
+		pointerRange = huart1.pRxBuffPtr;
 		WaitForAnswer_cmd_Buffer = memmem(rx_circular_buffer,strlen(rx_circular_buffer),ESP_Responses[3],strlen(ESP_Responses[3]));
 		if(strlen(WaitForAnswer_cmd_Buffer)>0)
 		{
 			while(waitingForReponse == 1 && (Millis() - TxWaitForResponse_TimeStmp) < ESP_ResponseTimeout_ms)
 				{
-				if(WaitForAnswer_ans_Buffer == memmem(rx_circular_buffer,strlen(rx_circular_buffer),"SEND OK\r\n",9))
+				if(WaitForAnswer_ans_Buffer == memmem(rx_circular_buffer,strlen(rx_circular_buffer),"OK\r\n",4))
 				{
 					pointerRange = WaitForAnswer_cmd_Buffer - WaitForAnswer_ans_Buffer;
-					ClearArray_Size(WaitForAnswer_cmd_Buffer, cmdSize + 9);
+					//ClearArray_Size(WaitForAnswer_cmd_Buffer, cmdSize + 9);
 					OKFound=1;
 					waitingForReponse = 0;
 				}
@@ -228,6 +256,7 @@ void Wifi_SendCommand(Wifi_Commands command)
 	//while(__HAL_USART_GET_IT_SOURCE(&huart1, USART_IT_TXE) != RESET)
 	//while(__HAL_USART_GET_IT_SOURCE(&huart1, USART_IT_TXE) == RESET)
 	//{
+		//HAL_UART_Transmit_DMA(&hdma_usart1_tx, *ATCommandsArray[command], strlen(ATCommandsArray[command]));
 		HAL_DMA_Start_IT(&hdma_usart1_tx, ATCommandsArray[command],  (uint32_t)&huart1.Instance->DR, strlen(ATCommandsArray[command]));
 			huart1.Instance->CR3 |= USART_CR3_DMAT;
 	//}
@@ -244,6 +273,7 @@ void Wifi_SendCommand(Wifi_Commands command)
 	HAL_DMA_Start_IT(&huart1,'\n', (uint32_t)&huart1.Instance->DR, strlen('\n'));
 		huart1.Instance->CR3 |= USART_CR3_DMAT;
 	*/
+	//Wifi_WaitForAnswer_SEND_OK(strlen(ATCommandsArray[command]));
 	Wifi_WaitForAnswerCMD(ATCommandsArray[command], strlen(ATCommandsArray[command]));
 	//for (wi=0;wi<735000;wi++);
 
