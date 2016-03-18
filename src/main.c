@@ -21,7 +21,7 @@ DMA_HandleTypeDef hdma_usart1_tx;
 DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 DMA_HandleTypeDef hdma_memtomem_dma2_stream0;
-uint8_t rx_circular_buffer[RxBuffSize];
+char rx_circular_buffer[RxBuffSize];
 char *AT = "AT";
 char *RST = "AT+RST";
 char *CIPSTART = "AT+CIPSTART=""TCP"",""172.16.11.6"",33333";
@@ -85,6 +85,9 @@ int main(void)
   {
 	  if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) != GPIO_PIN_SET)
 	  	  {
+		  	  //Wifi_SendCommand(WIFI_CHECK_MODULE_CONNECTION);
+		  	  //Wifi_SendCommand(WIFI_MODULE_RESET);
+		  	  Wifi_SendCommand(WIFI_START_CLIENT_CONN);
 		  	  Wifi_SendCommand(WIFI_CHECK_MODULE_CONNECTION);
 	  		  //HAL_Delay(1000);
 	  		  //HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)CIPSEND,  (uint32_t)&huart1.Instance->DR, strlen(CIPSEND));
@@ -97,6 +100,7 @@ int main(void)
 		  	  uint_fast8_t n = 0;
 		  	  //for(n=0; n<15; n++){
 				  uint_fast8_t found = 0;
+				  /*
 				  while(__HAL_USART_GET_IT_SOURCE(&huart1, USART_IT_TXE) == RESET)
 				  {
 					  HAL_DMA_Start_IT(&hdma_usart1_tx, ATCommandsArray[n],  (uint32_t)&huart1.Instance->DR, strlen(AT));
@@ -108,7 +112,7 @@ int main(void)
 						}else{
 							trace_write((char*)rx_circular_buffer && (char*)"ESP module not responding", 30);
 						}
-				  }
+				  }*/
 		  	  //}
 
 		  	  if(found == 1){
@@ -159,7 +163,6 @@ void SystemClock_Config(void)
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 */
-
 
 /* USER CODE BEGIN 4 */
 

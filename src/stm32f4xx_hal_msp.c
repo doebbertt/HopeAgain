@@ -10,7 +10,12 @@ extern DMA_HandleTypeDef hdma_usart2_rx;
 
 extern DMA_HandleTypeDef hdma_usart2_tx;
 
+extern UART_HandleTypeDef huart1;
+//extern UART_HandleTypeDef huart2;
+
 /* USER CODE BEGIN 0 */
+void DMATransferComplete(DMA_HandleTypeDef*hdma);
+void DMAReceivingComplete(DMA_HandleTypeDef*hdma);
 
 /* USER CODE END 0 */
 
@@ -34,11 +39,11 @@ void HAL_MspInit(void)
   /* USER CODE END MspInit 1 */
 }
 
-void HAL_UART_MspInit(UART_HandleTypeDef* huart)
+void HAL_UART_MspInit(UART_HandleTypeDef* huart1)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct;
-  if(huart->Instance==USART1)
+  if(huart1->Instance==USART1)
   {
   /* USER CODE BEGIN USART1_MspInit 0 */
 
@@ -72,10 +77,11 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     hdma_usart1_rx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_1QUARTERFULL;
     hdma_usart1_tx.Init.MemBurst = DMA_MBURST_SINGLE;
     hdma_usart1_tx.Init.PeriphBurst = DMA_PBURST_SINGLE;
-    //hdma_usart1_rx.XferCpltCallback = &DMAReceivingComplete;
+    hdma_usart1_rx.XferCpltCallback = &DMAReceivingComplete;
     HAL_DMA_Init(&hdma_usart1_rx);
+    //DMA_Cmd(&hdma_usart1_rx, ENABLE);
 
-    __HAL_LINKDMA(huart,hdmarx,hdma_usart1_rx);
+    __HAL_LINKDMA(huart1,hdmarx,hdma_usart1_rx);
 
     hdma_usart1_tx.Instance = DMA2_Stream7;
     hdma_usart1_tx.Init.Channel = DMA_CHANNEL_4;
@@ -87,10 +93,10 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     hdma_usart1_tx.Init.Mode = DMA_NORMAL;
     hdma_usart1_tx.Init.Priority = DMA_PRIORITY_LOW;
     hdma_usart1_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    //hdma_usart1_tx.XferCpltCallback = &DMATransferComplete;
+    hdma_usart1_tx.XferCpltCallback = &DMATransferComplete;
     HAL_DMA_Init(&hdma_usart1_tx);
 
-    __HAL_LINKDMA(huart,hdmatx,hdma_usart1_tx);
+    __HAL_LINKDMA(huart1,hdmatx,hdma_usart1_tx);
 
   /* Peripheral interrupt init*/
     HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
@@ -99,7 +105,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 
   /* USER CODE END USART1_MspInit 1 */
   }
-  else if(huart->Instance==USART2)
+  else //if(huart2->Instance==USART2)
   {
   /* USER CODE BEGIN USART2_MspInit 0 */
 
@@ -160,10 +166,10 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 
 }
 
-void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
+void HAL_UART_MspDeInit(UART_HandleTypeDef* huart1)
 {
 
-  if(huart->Instance==USART1)
+  if(huart1->Instance==USART1)
   {
   /* USER CODE BEGIN USART1_MspDeInit 0 */
 
@@ -178,8 +184,8 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9|GPIO_PIN_10);
 
     /* Peripheral DMA DeInit*/
-    HAL_DMA_DeInit(huart->hdmarx);
-    HAL_DMA_DeInit(huart->hdmatx);
+    HAL_DMA_DeInit(huart1->hdmarx);
+    HAL_DMA_DeInit(huart1->hdmatx);
 
     /* Peripheral interrupt DeInit*/
     HAL_NVIC_DisableIRQ(USART1_IRQn);
@@ -188,7 +194,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
 
   /* USER CODE END USART1_MspDeInit 1 */
   }
-  else if(huart->Instance==USART2)
+  else //if(huart2->Instance==USART2)
   {
   /* USER CODE BEGIN USART2_MspDeInit 0 */
 
@@ -203,14 +209,34 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_2|GPIO_PIN_3);
 
     /* Peripheral DMA DeInit*/
-    HAL_DMA_DeInit(huart->hdmarx);
-    HAL_DMA_DeInit(huart->hdmatx);
+    //HAL_DMA_DeInit(huart2->hdmarx);
+    //HAL_DMA_DeInit(huart2->hdmatx);
   /* USER CODE BEGIN USART2_MspDeInit 1 */
 
   /* USER CODE END USART2_MspDeInit 1 */
   }
 
 }
+
+void DMATransferComplete(DMA_HandleTypeDef*hdma){
+	if(hdma->Instance == DMA_CHANNEL_4) {
+		//Disable UART DMA mode
+		huart1.Instance->CR3 &= ~USART_CR3_DMAT;
+		//Turn LD2 ON
+		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+	}
+}
+
+void DMAReceivingComplete(DMA_HandleTypeDef*hdma){
+	if(hdma->Instance == DMA_CHANNEL_4) {
+		//Disable UART DMA mode
+		huart1.Instance->CR3 &= ~USART_CR3_DMAR;
+		//Turn LD2 ON
+		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+	}
+}
+
+
 
 /* USER CODE BEGIN 1 */
 
