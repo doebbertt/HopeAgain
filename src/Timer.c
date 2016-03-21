@@ -1,4 +1,5 @@
 #include "Timer.h"
+#include <time.h>
 
 //volatile uint32_t millis = 0;
 
@@ -13,11 +14,13 @@ NVIC_SetPriority(SysTick_IRQn, 0);
 
 }
 
-/*
-void Delay(uint16_t milliseconds)
+void delay(unsigned int mseconds)
 {
+    clock_t goal = mseconds + clock();
+    while (goal > clock());
 }
-*/
+
+
 /*
 uint32_t Micros()
 {

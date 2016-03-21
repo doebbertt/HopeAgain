@@ -23,7 +23,7 @@ typedef enum{
 
 void Init_Time(Time_Resolution res);
 
-void Delay(uint16_t milliseconds);
+void delay(unsigned int milliseconds);
 
 //uint32_t Micros();
 
