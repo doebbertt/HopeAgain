@@ -22,6 +22,7 @@ DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 DMA_HandleTypeDef hdma_memtomem_dma2_stream0;
 char rx_circular_buffer[RxBuffSize];
+char rx_circular_bufferTMP[RxBuffSizeTMP];
 //char *AT = "AT";
 //char *RST = "AT+RST";
 //char *CIPSTART = "AT+CIPSTART=""TCP"",""172.16.11.6"",33333";
@@ -79,30 +80,34 @@ int main(void)
 	*/
   HAL_UART_Receive_DMA(&huart1, rx_circular_buffer, RxBuffSize);
 
+  //HAL_Delay(2000);
+
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
 	  if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) != GPIO_PIN_SET)
 	  	  {
+		  	  //Wifi_SendCommand(WIFI_MODULE_RESET);
 		  	  //HAL_DMA_Start_IT(&hdma_usart1_rx, (uint32_t)&huart1.Instance->DR, rx_circular_buffer, strlen(rx_circular_buffer));
-		  	  Wifi_SendCommand(WIFI_MODULE_RESET);
+		  	  //Wifi_SendCommand(WIFI_MODULE_RESET);
 		  	  //ClearArray_Size(rx_circular_buffer, 2000);
 		  	  //HAL_Delay(2000);
 		  	  Wifi_SendCommand(WIFI_CHECK_MODULE_CONNECTION);
+		  	  trace_printf("rx_circular_buffer: %s", rx_circular_bufferTMP);
+		  	  trace_printf("rx_circular_buffer: %s", rx_circular_buffer);
+		  	  ClearArray_Size(rx_circular_bufferTMP, RxBuffSizeTMP);
 		  	  //HAL_Delay(500);
 		  	  Wifi_SendCommand(WIFI_START_CLIENT_CONN);
 		  	  //HAL_Delay(500);
-		  	  //HAL_DMA_Start_IT(&hdma_usart1_rx, (uint32_t)&huart1.Instance->DR, rx_circular_buffer, strlen(rx_circular_buffer));
-		  	  //Wifi_SendCommand(WIFI_CHECK_MODULE_CONNECTION);
-	  		  //HAL_Delay(1000);
-	  		  //HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)CIPSEND,  (uint32_t)&huart1.Instance->DR, strlen(CIPSEND));
-	  		  //huart1.Instance->CR3 |= USART_CR3_DMAT;
-	  		  //trace_write((char*)CIPSEND, 13);
-	  		  //HAL_Delay(2000);
-	  		  //HAL_DMA_Start_IT(&hdma_usart1_tx,  (uint32_t)msg,  (uint32_t)&huart1.Instance->DR, strlen(msg));
-	  		  //huart1.Instance->CR3 |= USART_CR3_DMAT;
-		  	  //checks if the command was send
+		  	  trace_printf("rx_circular_buffer: %s", rx_circular_bufferTMP);
+		  	  trace_printf("rx_circular_buffer: %s", rx_circular_buffer);
+		  	  ClearArray_Size(rx_circular_bufferTMP, RxBuffSizeTMP);
+		  	  Wifi_SendCustomCommand("Heisse Schnitte");
+		  	  trace_printf("rx_circular_buffer: %s", rx_circular_bufferTMP);
+		  	  trace_printf("rx_circular_buffer: %s", rx_circular_buffer);
+		  	  ClearArray_Size(rx_circular_bufferTMP, RxBuffSizeTMP);
 		  	  Wifi_SendCommand(WIFI_CLOSE_SOCKET_CONN);
 		  	  uint_fast8_t n = 0;
 		  	  //for(n=0; n<15; n++){

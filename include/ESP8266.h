@@ -79,9 +79,6 @@ extern const char *ATCommandsArray[18];
 
 #define WIFI_COMMAND(commandEnum) (ATCommandsArray[(commandEnum)])
 
-
-
-
 void Wifi_ReadyWaitForAnswer();
 void Wifi_WaitForAnswer();
 void Wifi_CloseConnection(uint8_t connectionNum);

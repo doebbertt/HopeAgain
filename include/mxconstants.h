@@ -2,13 +2,14 @@
 #define MXCONSTANTS_H_
 
 
-#define ESP_ResponseTimeout_ms 6000
+#define ESP_ResponseTimeout_ms 600
 #define ESP_USART USART1
 #define DEBUG_CMD_USART USART3
 
 //USART buffers and related
-#define RxBuffSize 2000
-#define USART_TxComplete_Timeout_ms 3000
+#define RxBuffSize 		2000
+#define RxBuffSizeTMP	500
+#define USART_TxComplete_Timeout_ms 300//3000
 #define DMA_Rx_Buff_Poll_Int_ms 500
 
 //Wifi related Variables and declarations

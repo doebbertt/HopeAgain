@@ -1,5 +1,6 @@
 #include "Timer.h"
 #include <time.h>
+#include "stm32f4xx_it.h"
 
 //volatile uint32_t millis = 0;
 
