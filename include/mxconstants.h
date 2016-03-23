@@ -4,22 +4,22 @@
 
 #define ESP_ResponseTimeout_ms 600
 #define ESP_USART USART1
-#define DEBUG_CMD_USART USART3
+#define DEBUG_CMD_USART USART2
 
 //USART buffers and related
 #define RxBuffSize 		2000
 #define RxBuffSizeTMP	500
 #define USART_TxComplete_Timeout_ms 300//3000
-#define DMA_Rx_Buff_Poll_Int_ms 500
+//#define DMA_Rx_Buff_Poll_Int_ms 500
 
 //Wifi related Variables and declarations
 #define WIFI_COMMAND_ERROR "ERROR" // Expected response from ESP8266 on error
 #define WIFI_COMMAND_ACCEPTED "OK" // Expected response from ESP8266 on successful command process
 #define WIFI_RX_LineComplete = "\r\n"
 
-//Helpful Macros
-#define countof(a)   (sizeof(a) / sizeof(*(a)))
-#define ARRAYSIZE(x) (sizeof(x)/sizeof (x)[0]) // Need to test this one.. I think its broken.
+////Helpful Macros
+//#define countof(a)   (sizeof(a) / sizeof(*(a)))
+//#define ARRAYSIZE(x) (sizeof(x)/sizeof (x)[0]) // Need to test this one.. I think its broken.
 
 
 /* Private define ------------------------------------------------------------*/

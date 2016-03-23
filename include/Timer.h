@@ -25,7 +25,7 @@ void Init_Time(Time_Resolution res);
 
 void delay(unsigned int milliseconds);
 
-//uint32_t Micros();
+uint32_t Micros();
 
 uint32_t Millis();
 

@@ -16,8 +16,22 @@
 // global variables
 //--------------------------------------------------------------
 uint8_t ds_data_read[9]; // to save the sensor data
+extern volatile char sensor_temp_str;
 
-
+const char *SensorArray[9]={
+		"Temperature is: ",
+		"22.1[degrees]",
+		"30.7[degrees]",
+		"Humidity is: ",
+		"80[percent]",
+		"22[percent]",
+		"Light is: ",
+		"01[lux]",
+		"50[lux]",
+		"WrongValue",
+};
+// https://de.wikipedia.org/wiki/Lux_(Einheit)
+//https://en.wikipedia.org/wiki/Lux
 
 //--------------------------------------------------------------
 // internal functions
@@ -34,7 +48,7 @@ float getLightSensorVal();
 //--------------------------------------------------------------
 float getTempSensorVal()
 {
-  float ret_val=22.1;
+  float ret_val= 22.1;
 
   return(ret_val);
 }

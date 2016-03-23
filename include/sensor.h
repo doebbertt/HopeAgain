@@ -50,7 +50,24 @@
 #define	 SensorLight_ERR_CODE	-1002	// if an Error occurs this light value will be transmitted
 
 
+typedef enum
+{
+	SENSOR_TEMP_MSG,
+	SENSOR_TEMP1,
+	SENSOR_TEMP2,
+	SENSOR_HUM_MSG,
+	SENSOR_HUM1,
+	SENSOR_HUM2,
+	SENSOR_LIGHT_MSG,
+	SENSOR_LIGHT1,
+	SENSOR_LIGHT2,
+	SENSOR_WRONG_VAL,
+}SensorData;
 
+extern const char *SensorArray[9];
+
+//void SENSOR_SendCommand(SensorData data);
+#define SENSOR_DATA(sensorEnum) (SensorArray[(sensorEnum)])
 //--------------------------------------------------------------
 // Sensor Functions
 //--------------------------------------------------------------
