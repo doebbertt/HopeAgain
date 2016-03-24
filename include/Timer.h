@@ -30,7 +30,4 @@ uint32_t Micros();
 uint32_t Millis();
 
 
-//systick interrupt
-
-
 #endif // _TIME_H_

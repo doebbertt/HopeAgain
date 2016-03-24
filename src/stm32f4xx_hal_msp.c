@@ -1,3 +1,8 @@
+/********************************************************
+ * Author: SUK & Thomas
+ * Date: 03/20/2016
+ * sensor.c (sensor library source file)
+ ********************************************************/
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
@@ -170,9 +175,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart1)
 
   if(huart1->Instance==USART1)
   {
-  /* USER CODE BEGIN USART1_MspDeInit 0 */
 
-  /* USER CODE END USART1_MspDeInit 0 */
     /* Peripheral clock disable */
     __USART1_CLK_DISABLE();
   
@@ -189,16 +192,9 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart1)
     /* Peripheral interrupt DeInit*/
     HAL_NVIC_DisableIRQ(USART1_IRQn);
 
-  /* USER CODE BEGIN USART1_MspDeInit 1 */
-
-  /* USER CODE END USART1_MspDeInit 1 */
   }
   else //if(huart2->Instance==USART2)
   {
-  /* USER CODE BEGIN USART2_MspDeInit 0 */
-
-  /* USER CODE END USART2_MspDeInit 0 */
-    /* Peripheral clock disable */
     __USART2_CLK_DISABLE();
   
     /**USART2 GPIO Configuration    
@@ -206,13 +202,6 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart1)
     PA3     ------> USART2_RX 
     */
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_2|GPIO_PIN_3);
-
-    /* Peripheral DMA DeInit*/
-    //HAL_DMA_DeInit(huart2->hdmarx);
-    //HAL_DMA_DeInit(huart2->hdmatx);
-  /* USER CODE BEGIN USART2_MspDeInit 1 */
-
-  /* USER CODE END USART2_MspDeInit 1 */
   }
 
 }
@@ -235,18 +224,3 @@ void DMAReceivingComplete(DMA_HandleTypeDef*hdma){
 	}
 }
 
-
-
-/* USER CODE BEGIN 1 */
-
-/* USER CODE END 1 */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

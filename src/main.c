@@ -25,13 +25,6 @@ DMA_HandleTypeDef hdma_memtomem_dma2_stream0;
 char rx_circular_buffer[RxBuffSize];
 char rx_circular_bufferTMP[RxBuffSizeTMP];
 char sensor_temp_str;
-//char *AT = "AT";
-//char *RST = "AT+RST";
-//char *CIPSTART = "AT+CIPSTART=""TCP"",""172.16.11.6"",33333";
-//char *CIPSEND = "AT+CIPSEND=5";
-char *msg = "HELLO";
-//volatile extern uint8_t waitingForResponse;
-uint8_t TxCounter = 0;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -62,16 +55,13 @@ int main(void)
 
   HAL_UART_Receive_DMA(&huart1, rx_circular_buffer, RxBuffSize);
 
+	//Reset ESP8266
 //  Wifi_SendCommand(WIFI_MODULE_RESET);
 //  trace_printf("rx_circular_buffer: %s", rx_circular_bufferTMP);
 //  trace_printf("rx_circular_buffer: %s", rx_circular_buffer);
 //  ClearArray_Size(rx_circular_bufferTMP, RxBuffSizeTMP);
 //  ClearArray_Size(rx_circular_buffer, RxBuffSize);
 
-
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
   uint8_t Mode = 0;
   while (1)
   {
@@ -83,17 +73,13 @@ int main(void)
 		  	  }else{
 		  		  Mode = 0;
 		  	  }
-//		  	  Wifi_SendCommand(WIFI_MODULE_RESET);
-//		  	  trace_printf("rx_circular_buffer: %s", rx_circular_bufferTMP);
-//		  	  trace_printf("rx_circular_buffer: %s", rx_circular_buffer);
-//		  	  ClearArray_Size(rx_circular_bufferTMP, RxBuffSizeTMP);
 		  	  Wifi_SendCommand(WIFI_CHECK_MODULE_CONNECTION);
-		  	  trace_printf("rx_circular_buffer: %s", rx_circular_bufferTMP);
-		  	  //trace_printf("rx_circular_buffer: %s", rx_circular_buffer);
-		  	  ClearArray_Size(rx_circular_bufferTMP, RxBuffSizeTMP);
+		  	  //trace_printf("rx_circular_buffer: %s", rx_circular_bufferTMP);
+		  	  trace_printf("rx_circular_buffer: %s", rx_circular_buffer);
+		  	  //ClearArray_Size(rx_circular_bufferTMP, RxBuffSizeTMP);
 		  	  Wifi_SendCommand(WIFI_START_CLIENT_CONN);
-		  	  trace_printf("rx_circular_buffer: %s", rx_circular_bufferTMP);
-		  	  //trace_printf("rx_circular_buffer: %s", rx_circular_buffer);
+		  	  //trace_printf("rx_circular_buffer: %s", rx_circular_bufferTMP);
+		  	  trace_printf("rx_circular_buffer: %s", rx_circular_buffer);
 		  	  ClearArray_Size(rx_circular_bufferTMP, RxBuffSizeTMP);
 
 		  	  Wifi_SendCustomCommand(WIFI_SEND_TEMP_MSG, SENSOR_TEMP_MSG);
@@ -102,8 +88,8 @@ int main(void)
 		  	  }else{
 		  		Wifi_SendCustomCommand(WIFI_SEND_TEMP_VAL, SENSOR_TEMP2);
 		  	  }
-		  	  trace_printf("rx_circular_buffer: %s", rx_circular_bufferTMP);
-		  	  //trace_printf("rx_circular_buffer: %s", rx_circular_buffer);
+		  	  //trace_printf("rx_circular_buffer: %s", rx_circular_bufferTMP);
+		  	  trace_printf("rx_circular_buffer: %s", rx_circular_buffer);
 		  	  ClearArray_Size(rx_circular_bufferTMP, RxBuffSizeTMP);
 		  	  Wifi_SendCustomCommand(WIFI_SEND_HUM_MSG, SENSOR_HUM_MSG);
 		  	  if(Mode == 0){
@@ -111,8 +97,8 @@ int main(void)
 		  	  }else{
 		  		Wifi_SendCustomCommand(WIFI_SEND_HUM_VAL, SENSOR_HUM2);
 		  	  }
-		  	  trace_printf("rx_circular_buffer: %s", rx_circular_bufferTMP);
-		  	  //trace_printf("rx_circular_buffer: %s", rx_circular_buffer);
+		  	  //trace_printf("rx_circular_buffer: %s", rx_circular_bufferTMP);
+		  	  trace_printf("rx_circular_buffer: %s", rx_circular_buffer);
 		  	  ClearArray_Size(rx_circular_bufferTMP, RxBuffSizeTMP);
 		  	  Wifi_SendCustomCommand(WIFI_SEND_LIGHT_MSG, SENSOR_LIGHT_MSG);
 		  	  if(Mode == 0){
@@ -120,8 +106,8 @@ int main(void)
 		  	  }else{
 		  		Wifi_SendCustomCommand(WIFI_SEND_LIGHT_VAL, SENSOR_LIGHT2);
 		  	  }
-		  	  trace_printf("rx_circular_buffer: %s", rx_circular_bufferTMP);
-		  	  //trace_printf("rx_circular_buffer: %s", rx_circular_buffer);
+		  	  //trace_printf("rx_circular_buffer: %s", rx_circular_bufferTMP);
+		  	  trace_printf("rx_circular_buffer: %s", rx_circular_buffer);
 		  	  ClearArray_Size(rx_circular_bufferTMP, RxBuffSizeTMP);
 
 		  	  Wifi_SendCommand(WIFI_CLOSE_SOCKET_CONN);
